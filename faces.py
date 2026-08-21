@@ -34,7 +34,7 @@ def _load_yolo():
         from ultralytics import YOLO
         _YOLO = YOLO(_YOLO_PATH)
         # warmup on dummy
-        _YOLO.predict(np.zeros((320, 320, 3), dtype=np.uint8), verbose=False)
+        _YOLO.predict(np.zeros((320, 320, 3), dtype=np.uint8), verbose=False, device="cpu")
     except Exception as e:
         _YOLO_LOAD_ERR = str(e)
         _YOLO = None
@@ -77,7 +77,7 @@ def _detect_yolo(img_bgr: np.ndarray, conf_threshold: float = 0.25):
     if yolo is None:
         return []
     try:
-        res = yolo.predict(img_bgr, conf=conf_threshold, verbose=False, device=0)
+        res = yolo.predict(img_bgr, conf=conf_threshold, verbose=False, device="cpu")
         out = []
         for r in res:
             boxes = r.boxes

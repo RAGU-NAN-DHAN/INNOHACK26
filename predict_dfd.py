@@ -14,7 +14,7 @@ from torch import nn
 from torchvision import models, transforms
 
 from faces import detect_with_boxes
-from predict import IoUTracker, _blur_score, _fake_heatmap, predict as predict_current
+from predict import IoUTracker, _blur_score, _fallback_heatmap, predict as predict_current
 
 PROJECT = Path(__file__).resolve().parent
 CHECKPOINT = PROJECT / "models" / "model_dfd_b4_best.pt"
@@ -57,9 +57,10 @@ def _model():
 def _score(crops):
     result = []
     model = _model()
-    for start in range(0, len(crops), 24):
+    batch_size = 12 if DEVICE.type == "cuda" else 4
+    for start in range(0, len(crops), batch_size):
         tensors = []
-        for crop in crops[start:start + 24]:
+        for crop in crops[start:start + batch_size]:
             rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
             tensors.append(TFM(Image.fromarray(rgb)))
         batch = torch.stack(tensors).to(DEVICE)
@@ -144,7 +145,7 @@ def predict_video(path):
     for index in sorted(ordered_frames, key=lambda i: frame_scores[i], reverse=True)[:5]:
         crop, bbox = frame_crops[index]
         top_frames.append({"frame_index": index, "score": frame_scores[index], "face_bgr": crop,
-                           "heatmap_bgr": _fake_heatmap(crop), "bbox": bbox,
+                           "heatmap_bgr": _fallback_heatmap(crop), "bbox": bbox,
                            "n_faces_in_frame": len(by_frame[index])})
     return {"kind": "video", "score": overall, "verdict": verdict, "confidence": confidence,
             "per_frame": per_frame, "frame_indices": ordered_frames, "fps_sampled": source_fps or 1.0,
