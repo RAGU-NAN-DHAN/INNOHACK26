@@ -14,7 +14,7 @@ DB_PATH = "deepfake.db"
 # ─────────────────────────────────────────────────────────────────────────────
 
 def init_db() -> None:
-    """Create tables and seed the default admin account."""
+    """Create the authentication and analysis tables."""
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
@@ -51,10 +51,6 @@ def init_db() -> None:
 
     conn.commit()
 
-    # Seed default admin
-    c.execute("SELECT id FROM users WHERE username = 'admin'")
-    if not c.fetchone():
-        _create_user(conn, "admin", "admin@deepfake.ai", "Admin@123", "admin")
 
     conn.close()
 

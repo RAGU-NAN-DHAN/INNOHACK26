@@ -111,6 +111,8 @@ def _ffprobe_meta(path: str) -> dict:
         fmt = j.get("format", {}); streams = j.get("streams", [])
         v = next((s for s in streams if s.get("codec_type") == "video"), {})
         a = next((s for s in streams if s.get("codec_type") == "audio"), {})
+        format_tags = fmt.get("tags", {}) or {}
+        video_tags = v.get("tags", {}) or {}
         return {
             "format_name":    fmt.get("format_name"),
             "duration_sec":   float(fmt.get("duration", 0) or 0),
@@ -122,6 +124,8 @@ def _ffprobe_meta(path: str) -> dict:
             "video_pix_fmt":  v.get("pix_fmt"),
             "audio_codec":    a.get("codec_name") if a else None,
             "audio_channels": a.get("channels") if a else None,
+            "encoder":         format_tags.get("encoder") or video_tags.get("encoder"),
+            "creation_time":   format_tags.get("creation_time") or video_tags.get("creation_time"),
         }
     except FileNotFoundError:
         return {"note": "ffprobe (from ffmpeg) not installed"}
