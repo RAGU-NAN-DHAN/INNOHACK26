@@ -1,6 +1,6 @@
 # DeepGuard — Deepfake Detection and Digital Evidence Authentication
 
-## [Open the public DeepGuard website](https://ragu-nan-dhan.github.io/INNOHACK26/)
+## [Open the public DeepGuard website](https://raw.githack.com/RAGU-NAN-DHAN/INNOHACK26/main/site/index.html)
 
 DeepGuard is a notebook-first hackathon project for screening images and videos for facial manipulation. It combines multi-face detection, video tracking, model uncertainty, evidence hashing, metadata checks, suspicious-frame timestamps, and a black/green Streamlit interface.
 
